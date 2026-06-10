@@ -7,11 +7,21 @@ import type { User } from "@supabase/supabase-js";
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
 
   useEffect(() => {
+    const supabase = createClient();
+
+    // Skip auth if using placeholder credentials
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+    if (!url || url.includes("placeholder")) {
+      setLoading(false);
+      return;
+    }
+
     supabase.auth.getUser().then(({ data }) => {
       setUser(data.user);
+      setLoading(false);
+    }).catch(() => {
       setLoading(false);
     });
 
@@ -22,8 +32,14 @@ export function useAuth() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = () => supabase.auth.signInWithOAuth({ provider: "google" });
-  const signOut = () => supabase.auth.signOut();
+  const signIn = () => {
+    const supabase = createClient();
+    supabase.auth.signInWithOAuth({ provider: "google" });
+  };
+  const signOut = () => {
+    const supabase = createClient();
+    supabase.auth.signOut();
+  };
 
   return { user, loading, signIn, signOut };
 }

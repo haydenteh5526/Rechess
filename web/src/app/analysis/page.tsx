@@ -24,6 +24,7 @@ export default function AnalysisPage() {
   const [undonePositions, setUndonePositions] = useState<string[]>([]);
   const [flipped, setFlipped] = useState(false);
   const [engineError, setEngineError] = useState<string | null>(null);
+  const [analysisDepth, setAnalysisDepth] = useState(20);
   const engineRef = useRef<StockfishEngine | null>(null);
   const chessRef = useRef(new Chess());
   const movesEndRef = useRef<HTMLDivElement>(null);
@@ -33,7 +34,7 @@ export default function AnalysisPage() {
       engineRef.current = new StockfishEngine();
       try {
         await engineRef.current.init();
-        engineRef.current.startAnalysis(fen, (ev) => { setEval(ev); setBestMove(ev.bestMove); });
+        engineRef.current.startAnalysis(fen, (ev) => { setEval(ev); setBestMove(ev.bestMove); }, analysisDepth);
       } catch (e) {
         setEngineError((e as Error).message);
       }
@@ -47,12 +48,19 @@ export default function AnalysisPage() {
     movesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [moveHistory]);
 
+  // Re-analyze when depth changes
+  useEffect(() => {
+    if (engineRef.current) {
+      engineRef.current.startAnalysis(chessRef.current.fen(), (ev) => { setEval(ev); setBestMove(ev.bestMove); }, analysisDepth);
+    }
+  }, [analysisDepth]);
+
   const updateState = (move?: { from: string; to: string }) => {
     setLastMove(move ?? null);
     setMoveHistory(chessRef.current.history());
     const newFen = chessRef.current.fen();
     setFen(newFen);
-    engineRef.current?.startAnalysis(newFen, (ev) => { setEval(ev); setBestMove(ev.bestMove); });
+    engineRef.current?.startAnalysis(newFen, (ev) => { setEval(ev); setBestMove(ev.bestMove); }, analysisDepth);
   };
 
   const handleMove = useCallback((from: string, to: string, promotion?: string) => {
@@ -65,9 +73,9 @@ export default function AnalysisPage() {
       setUndonePositions([]);
       const newFen = chessRef.current.fen();
       setFen(newFen);
-      engineRef.current?.startAnalysis(newFen, (ev) => { setEval(ev); setBestMove(ev.bestMove); });
+      engineRef.current?.startAnalysis(newFen, (ev) => { setEval(ev); setBestMove(ev.bestMove); }, analysisDepth);
     } catch {}
-  }, []);
+  }, [analysisDepth]);
 
   const handleReset = () => {
     setUndonePositions(chessRef.current.history());
@@ -196,8 +204,28 @@ export default function AnalysisPage() {
               </div>
               <span className="text-lg font-bold font-mono text-white">{cpDisplay}</span>
             </div>
-            <div className="flex items-center justify-between mt-1">
-              <span className="text-[10px] text-[#C3C3C0]/50">Depth {eval_?.depth ?? 0}</span>
+            <div className="flex items-center justify-between mt-2">
+              <span className="text-[10px] text-[#C3C3C0]/50">Depth {eval_?.depth ?? 0}/{analysisDepth}</span>
+              <div className="flex gap-0.5">
+                {[
+                  { label: "12", value: 12 },
+                  { label: "18", value: 18 },
+                  { label: "20", value: 20 },
+                  { label: "24", value: 24 },
+                ].map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setAnalysisDepth(opt.value)}
+                    className={`px-1.5 py-0.5 text-[10px] rounded font-medium transition-colors ${
+                      analysisDepth === opt.value
+                        ? "bg-[#81b64c] text-[#262421]"
+                        : "bg-[#32302E] text-[#C3C3C0] hover:bg-[#3a3835]"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
             </div>
             {eval_?.pv && eval_.pv.length > 0 && (() => {
               // Convert UCI moves to SAN for display

@@ -24,6 +24,7 @@ export default function ReviewPage() {
   const [flipped, setFlipped] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [progress, setProgress] = useState<AnalysisProgress | null>(null);
+  const [depth, setDepth] = useState(18);
   const engineRef = useRef<StockfishEngine | null>(null);
 
   useEffect(() => {
@@ -41,7 +42,7 @@ export default function ReviewPage() {
         engineRef.current = new StockfishEngine();
         await engineRef.current.init();
       }
-      const result = await analyzeGame(pgn, engineRef.current, setProgress);
+      const result = await analyzeGame(pgn, engineRef.current, setProgress, depth);
       setReview(result);
       setCurrentIndex(0);
       playAnalysisChime();
@@ -158,7 +159,7 @@ export default function ReviewPage() {
               </div>
             </div>
           ) : (
-            <GameImport onImport={handleImport} loading={analyzing} />
+            <GameImport onImport={handleImport} loading={analyzing} depth={depth} onDepthChange={setDepth} />
           )}
         </main>
       </>

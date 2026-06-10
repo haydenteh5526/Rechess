@@ -6,6 +6,8 @@ import { Upload, Link, FileText } from "lucide-react";
 interface GameImportProps {
   onImport: (pgn: string) => void;
   loading?: boolean;
+  depth: number;
+  onDepthChange: (d: number) => void;
 }
 
 /**
@@ -35,7 +37,7 @@ function isChessComUrl(s: string): boolean {
   return /chess\.com\/.*game\/(live|daily)\/\d+/.test(s);
 }
 
-export function GameImport({ onImport, loading }: GameImportProps) {
+export function GameImport({ onImport, loading, depth, onDepthChange }: GameImportProps) {
   const [input, setInput] = useState("");
   const [tab, setTab] = useState<"paste" | "file">("paste");
   const [fetching, setFetching] = useState(false);
@@ -104,6 +106,29 @@ export function GameImport({ onImport, loading }: GameImportProps) {
             className="w-full h-44 bg-[#1a1816] border border-white/5 rounded-lg p-3 text-sm text-text resize-none focus:outline-none focus:border-accent/50 placeholder:text-muted/50"
           />
           {error && <p className="text-sm text-blunder">{error}</p>}
+          {/* Depth selector */}
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-[#C3C3C0]">Analysis Depth</span>
+            <div className="flex gap-1">
+              {[
+                { label: "Quick", value: 12 },
+                { label: "Standard", value: 18 },
+                { label: "Deep", value: 22 },
+              ].map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => onDepthChange(opt.value)}
+                  className={`px-2.5 py-1 text-xs rounded font-medium transition-colors ${
+                    depth === opt.value
+                      ? "bg-[#81b64c] text-[#262421]"
+                      : "bg-[#1a1816] text-[#C3C3C0] hover:bg-[#3a3835]"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
           <button
             onClick={handleSubmit}
             disabled={isLoading || !input.trim()}
