@@ -1,0 +1,5 @@
+{
+  "name": "rechess",
+  "private": true,
+  "workspaces": ["shared", "web"]
+}

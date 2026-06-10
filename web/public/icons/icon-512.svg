@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#262421"/>
+  <g opacity="0.05">
+    <rect x="256" y="256" width="64" height="64" fill="#fff"/>
+    <rect x="384" y="256" width="64" height="64" fill="#fff"/>
+    <rect x="320" y="320" width="64" height="64" fill="#fff"/>
+    <rect x="256" y="384" width="64" height="64" fill="#fff"/>
+    <rect x="384" y="384" width="64" height="64" fill="#fff"/>
+    <rect x="64" y="320" width="64" height="64" fill="#fff"/>
+    <rect x="192" y="320" width="64" height="64" fill="#fff"/>
+    <rect x="128" y="384" width="64" height="64" fill="#fff"/>
+  </g>
+  <g transform="translate(256, 256)" fill="#81b64c">
+    <polygon points="0,-115 -36,-30 -105,-58 -82,62 82,62 105,-58 36,-30" stroke="#81b64c" stroke-width="5" stroke-linejoin="round"/>
+    <circle cx="0" cy="-115" r="15" fill="#81b64c"/>
+    <circle cx="-105" cy="-58" r="12" fill="#81b64c"/>
+    <circle cx="105" cy="-58" r="12" fill="#81b64c"/>
+    <rect x="-88" y="62" width="176" height="30" rx="8" fill="#81b64c"/>
+  </g>
+</svg>
